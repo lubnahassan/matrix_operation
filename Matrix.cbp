@@ -1,45 +1,196 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="Matrix" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/Matrix" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Matrix" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
-		</Compiler>
-		<Unit filename="MATRIX.cpp" />
-		<Unit filename="MATRIX.h" />
-		<Unit filename="main.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-			<lib_finder disable_auto="1" />
-		</Extensions>
-	</Project>
-</CodeBlocks_project_file>
+#ifndef MATRIX_H
+#define MATRIX_H
+#include <iostream>
+#include <ostream>
+using namespace std;
+template <class T>
+class MATRIX
+{
+public:
+    MATRIX();
+    MATRIX(int Row,int Col);
+    //MATRIX(int Row,int Col,T num[]);
+    void setRow (int R);
+    void setCol (int C);
+    int getRow();
+    int getCol();
+    void create(int R,int C);
+    MATRIX operator+(const MATRIX &matri);
+    MATRIX operator-(const MATRIX &matri);
+    MATRIX operator*(const MATRIX &matri);
+    MATRIX Transpose();
+    template<class M >
+    friend ostream&operator<<(ostream&out,const MATRIX<M>&matri);
+    template<class M >
+    friend istream&operator>>(istream&in,MATRIX<M>&matri);
+    virtual ~MATRIX();
+private:
+    T**data; ///pointer to 2D array
+    int Row,Col;
+};
+///ostream&operator<<(ostream&out,MATRIX<T>matri);
+//template<class T>
+//istream operator>>(istream&in,MATRIX<T>&matri);
+template<class T> MATRIX<T>::MATRIX()
+{
+    //ctor
+}
+
+template <class T> MATRIX<T>::~MATRIX()
+{
+    //dtor
+}
+/*template<class T>
+MATRIX<T>::MATRIX(int Row,int Col,T num[])
+{
+   // T matri;
+    this->Row=Row;
+    this->Col=Col;
+    this->data=new T [Row*Col];
+    for(int i=0; i<Row*Col; i++)
+    {
+        this->data[i]=num[i];
+    }
+}*/
+template<class T>
+void MATRIX<T>::setRow(int R)
+{
+    Row=R;
+}
+template<class T>
+void MATRIX<T>::setCol(int C)
+{
+    Col=C;
+}
+template<class T>
+void MATRIX<T>::create(int R,int C)
+{
+    Row = R;
+    Col = C;
+    data = new T* [R];
+    for (int i = 0; i < Row; i++)
+    {
+        data[i] = new T [C];
+    }
+}
+template<class T>
+int MATRIX<T>::getRow()
+{
+    return Row;
+}
+template<class T>
+int MATRIX<T>::getCol()
+{
+    return Col;
+}
+template<class T> MATRIX<T>
+MATRIX<T>::operator+ (const MATRIX &matri)
+{
+    assert((Row==matri.Row)&&(Col==matri.Col));
+    MATRIX mat1;
+    mat1.Row=Row;
+    mat1.Col=Col;
+    mat1.create(mat1.Row,mat1.Col);
+    for (int i=0; i<matri.Row; i++)
+    {
+        for(int j=0; j<matri.Col; j++)
+        {
+            mat1.data[i][j]=data[i][j]+matri.data[i][j];
+
+        }
+    }
+    return mat1;
+}
+template<class T> MATRIX<T>
+MATRIX<T>::operator- (const MATRIX &matri)
+{
+    assert((Row==matri.Row)&&(Col==matri.Col));
+    MATRIX mat1;
+    mat1.Row=Row;
+    mat1.Col=Col;
+    mat1.create(mat1.Row,mat1.Col);
+    for (int i=0; i<matri.Row; i++)
+    {
+        for (int j=0; j<matri.Col; j++)
+        {
+            mat1.data[i][j]=data[i][j]-matri.data[i][j];
+        }
+    }
+    return mat1;
+}
+template<class T> MATRIX<T>
+MATRIX<T>::operator* (const MATRIX &matri)
+{
+    assert((Col=matri.Row));
+    MATRIX mat1;
+    mat1.Row=Row;
+    mat1.Col=Col;
+    mat1.create(mat1.Row,mat1.Col);
+    for ( int i = 0; i < Row; i++)
+    {
+        for ( int j = 0; j < matri.Col; j++)
+        {
+            mat1.data[i][j]=0;
+            for (int k = 0; k < mat1.Row; k++)
+            {
+                mat1.data[i][j] += data[i][k] * matri.data[k][j];
+            }
+        }
+    }
+    return mat1;
+}
+
+template<class T> MATRIX<T>
+MATRIX<T>::Transpose()
+{
+    MATRIX mat2;
+    mat2.Row=Col;
+    mat2.Col=Row;
+    mat2.create(mat2.Row,mat2.Col);
+    for (int i=0; i<Col; i++)
+    {
+        for(int j= 0; j < Row ; j++)
+        {
+            mat2. data[i][j]=data[j][i];
+
+            cout<<endl;
+
+        }
+    }
+    return mat2;
+}
+
+template<class T0>
+ostream& operator<<(ostream& out, const MATRIX<T0>&matri)
+{
+    for (int i=0; i<(matri.Row); i++)
+    {
+        for (int j=0; j<matri.Col; j++)
+        {
+            out<<matri.data[i][j]<<" ";
+        }
+        out<<endl;
+    }
+
+    return out;
+}
+
+template<class T0>
+istream& operator>>(istream&in, MATRIX<T0>&matri)
+{
+    cout<<"Enter Matrix Rows : ";
+    cin>>matri.Row;
+    cout<<"Enter Matrix Cols : ";
+    cin>>matri.Col;
+    matri.create(matri.Row,matri.Col);
+    cout<<"enter the data: "<<endl;
+    for (int i=0; i<matri.Row; i++)
+    {
+        for (int j=0; j<matri.Col; j++)
+        {
+            in>>matri.data[i][j];
+        }
+    }
+}
+
+#endif // MATRIX_H
